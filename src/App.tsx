@@ -3,14 +3,11 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import CurrencyBlock from './components/CurrencyBlock';
 import { RATES_ENDPOINT, API_KEY } from './config';
+import axios, { AxiosRequestConfig } from 'axios';
 
-const myHeaders = new Headers();
-myHeaders.append('apikey', API_KEY);
-
-const requestOptions: RequestInit = {
+const requestOptions: AxiosRequestConfig = {
   method: 'GET',
-  redirect: 'follow',
-  headers: myHeaders,
+  headers: { apikey: API_KEY },
 };
 
 interface IApiResponse {
@@ -32,23 +29,27 @@ function App() {
   const [amountTo, setAmountTo] = useState<number>(0);
 
   useEffect(() => {
-    fetch(RATES_ENDPOINT, requestOptions)
-      .then((response) => response.json())
-      .then((result: IApiResponse) => {
-        const firstCurrency = Object.keys(result.rates)[0];
-        setCurrencyOption([...Object.keys(result.rates)]);
-        setCurrencyFrom(result.base);
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get<IApiResponse>(RATES_ENDPOINT, requestOptions);
+
+        const firstCurrency = Object.keys(data.rates)[0];
+        setCurrencyOption([...Object.keys(data.rates)]);
+        setCurrencyFrom(data.base);
         setCurrencyTo(firstCurrency);
-        setExchangeRate(result.rates[firstCurrency]);
-      })
-      .catch((error) => console.log('error', error));
+        setExchangeRate(data.rates[firstCurrency]);
+      } catch (error) {
+        console.log('error', error);
+      }
+    };
+    fetchData();
   }, []);
 
   useEffect(() => {
     if (currencyFrom !== '' && currencyTo !== '') {
-      fetch(`${RATES_ENDPOINT}?base=${currencyFrom}&symbols=${currencyTo}`, requestOptions)
-        .then((res) => res.json())
-        .then((result) => setExchangeRate(result.rates[currencyTo]));
+      axios
+        .get(`${RATES_ENDPOINT}?base=${currencyFrom}&symbols=${currencyTo}`, requestOptions)
+        .then(({ data }) => setExchangeRate(data.rates[currencyTo]));
     }
   }, [currencyFrom, currencyTo]);
 
