@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import "./App.css";
-import "bootstrap/dist/css/bootstrap.css";
-import CurrencyBlock from "./components/CurrencyBlock";
+import React, { useEffect, useState } from 'react';
+import './App.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import CurrencyBlock from './components/CurrencyBlock';
+import { RATES_ENDPOINT, API_KEY } from './config';
 
-const BASE_URL = "https://api.apilayer.com/exchangerates_data/latest";
+const myHeaders = new Headers();
+myHeaders.append('apikey', API_KEY);
 
-let myHeaders = new Headers();
-myHeaders.append("apikey", "UvutixKmnrrL98MexRZlQKDsRTnMsCMY");
-
-let requestOptions: RequestInit = {
-  method: "GET",
-  redirect: "follow",
+const requestOptions: RequestInit = {
+  method: 'GET',
+  redirect: 'follow',
   headers: myHeaders,
 };
-interface IResult {
+
+interface IApiResponse {
   success: boolean;
   timestamp: number;
   base: string;
@@ -25,33 +25,28 @@ interface IResult {
 
 function App() {
   const [currencyOption, setCurrencyOption] = useState<string[]>([]);
-  const [currencyFrom, setCurrencyFrom] = useState<string>("");
-  const [currencyTo, setCurrencyTo] = useState<string>("");
+  const [currencyFrom, setCurrencyFrom] = useState<string>('');
+  const [currencyTo, setCurrencyTo] = useState<string>('');
   const [exchangeRate, setExchangeRate] = useState<number>(0);
   const [amountFrom, setAmountFrom] = useState<number>(0);
   const [amountTo, setAmountTo] = useState<number>(0);
 
   useEffect(() => {
-    fetch(BASE_URL, requestOptions)
+    fetch(RATES_ENDPOINT, requestOptions)
       .then((response) => response.json())
-      .then((result: IResult) => {
+      .then((result: IApiResponse) => {
         const firstCurrency = Object.keys(result.rates)[0];
-        // setCurrencyOption([result.base, ...Object.keys(result.rates)]);
         setCurrencyOption([...Object.keys(result.rates)]);
         setCurrencyFrom(result.base);
         setCurrencyTo(firstCurrency);
         setExchangeRate(result.rates[firstCurrency]);
-        // setResult(result);
       })
-      .catch((error) => console.log("error", error));
+      .catch((error) => console.log('error', error));
   }, []);
 
   useEffect(() => {
-    if (currencyFrom !== "" && currencyTo !== "") {
-      fetch(
-        `${BASE_URL}?base=${currencyFrom}&symbols=${currencyTo}`,
-        requestOptions
-      )
+    if (currencyFrom !== '' && currencyTo !== '') {
+      fetch(`${RATES_ENDPOINT}?base=${currencyFrom}&symbols=${currencyTo}`, requestOptions)
         .then((res) => res.json())
         .then((result) => setExchangeRate(result.rates[currencyTo]));
     }
@@ -61,10 +56,8 @@ function App() {
     setAmountTo(amountFrom * exchangeRate);
   }, [amountFrom, exchangeRate]);
 
-  const selectHandlerCurrencyFrom = (e: React.ChangeEvent<HTMLSelectElement>) =>
-    setCurrencyFrom(e.target.value);
-  const selectHandlerCurrencyTo = (e: React.ChangeEvent<HTMLSelectElement>) =>
-    setCurrencyTo(e.target.value);
+  const selectHandlerCurrencyFrom = (e: React.ChangeEvent<HTMLSelectElement>) => setCurrencyFrom(e.target.value);
+  const selectHandlerCurrencyTo = (e: React.ChangeEvent<HTMLSelectElement>) => setCurrencyTo(e.target.value);
 
   const inputHandlerAmountFrom = (e: React.ChangeEvent<HTMLInputElement>) => {
     const amount = Number(e.target.value);
@@ -79,9 +72,9 @@ function App() {
       <div className=" d-flex justify-content-center">
         <div>
           <CurrencyBlock
-            selectTitle={"Базовая валюта"}
+            selectTitle={'Базовая валюта'}
             currencyOption={currencyOption}
-            placeholder={"Введите число"}
+            placeholder={'Введите число'}
             readOnly={false}
             amount={amountFrom}
             selectedCurrency={currencyFrom}
@@ -92,14 +85,13 @@ function App() {
         <span className="align-self-center p-2 ">=</span>
         <div>
           <CurrencyBlock
-            selectTitle={"Целевая валюта"}
+            selectTitle={'Целевая валюта'}
             currencyOption={currencyOption}
-            placeholder={"Итоговое число"}
+            placeholder={'Итоговое число'}
             readOnly={true}
             amount={amountTo}
             selectedCurrency={currencyTo}
             onChangeCurrency={selectHandlerCurrencyTo}
-            // onChangeAmount={selectHandlerAmountFrom}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
-import React from "react";
-import CurrencySelect, { ICurrencySelectProps } from "./CurrencySelect";
-import Input, { IInputProps } from "./Input";
+import React from 'react';
+import CurrencySelect from './CurrencySelect';
+import Input from './Input';
 
 interface ICurrencyBlockProps {
   selectTitle: string;
@@ -12,11 +12,9 @@ interface ICurrencyBlockProps {
 
   selectedCurrency: string;
   onChangeCurrency: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  // onChangeCurrency: () => string;
   onChangeAmount?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-// function CurrencyBlock({currencyOption, amountFrom, selectTitle}:ICurrencySelectProps|IInputProps) {
 function CurrencyBlock({
   selectTitle,
   currencyOption,
@@ -36,12 +34,7 @@ function CurrencyBlock({
         onChangeCurrency={onChangeCurrency}
       />
       <br />
-      <Input
-        placeholder={placeholder}
-        readOnly={readOnly}
-        amount={amount}
-        onChangeAmount={onChangeAmount}
-      />
+      <Input placeholder={placeholder} readOnly={readOnly} amount={amount} onChangeAmount={onChangeAmount} />
     </div>
   );
 }
