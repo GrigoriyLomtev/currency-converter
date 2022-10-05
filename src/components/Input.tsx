@@ -8,10 +8,15 @@ export interface IInputProps {
 }
 
 function Input({ placeholder, readOnly, amount, onChangeAmount }: IInputProps) {
-  return readOnly ? (
-    <input className="w-100" type="number" placeholder={placeholder} value={amount} readOnly />
-  ) : (
-    <input className="w-100" type="number" placeholder={placeholder} value={amount} onChange={onChangeAmount} />
+  return (
+    <input
+      className="w-100"
+      type="number"
+      placeholder={placeholder}
+      value={amount}
+      onChange={onChangeAmount}
+      readOnly={readOnly}
+    />
   );
 }
 
